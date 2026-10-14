@@ -126,3 +126,46 @@ Change: Align walkthrough headings, order, explanations, comparisons and current
 Decision: Approve — explicitly requested by Cam.
 Status: Verified.
 Verification: Parsed all 17 current slide chunks and 16 starter chunks; executed enabled source chunks and starter chunks with the three practice steps supplied only in memory. Every distinct R expression in the slides is represented in the starter or an intentional practice gap; duplicated display/output slide blocks are consolidated. Four fitted model coefficient vectors, all training/holdout data and all predictions match exactly. MAE results including the 55% overfit gap are unchanged. All five blank chunks (three practice steps, live coding, final exercise) match their original contents exactly. Live coding now includes the current caveats and $1,000 budget/$10 per contact questions; no solution added. Exercise instructions and main comparison tables match slides verbatim. The starter keeps MAE only, under the prior instruction to reserve RMSE discussion for the slides introducing metrics. It refers correctly to 1,946 coefficients from 12 variables. Class split remains 80/20; exercise remains 75/25, seed 42. Source/solution/HTML protected hashes unchanged. Diff reviewed, whitespace check passes. No rendering, Canvas writes, commit or push.
+
+
+6. Canvas — Exercise 8 (1452115), Grade Exercise 8 (1452133).
+Issue/evidence: empty exercise description and no rubric-in-solution note.
+Change proposed: post final Exercise 8 instructions, add one rubric note after solution is aligned, preserve all unrelated settings/content and read back both assignments.
+Effect: Depends on local exercise and solution. No Canvas write authorized yet.
+Decision: Approve — Cam authorized commit/push, Canvas publication and scheduling on 2026-10-14.
+Status: Verified.
+Completion evidence — 2026-10-14: Verified Exercise 8 (1452115) description against the current slide instructions, including two plausible models, 75/25 seed-42 split, R-squared and MAE, client recommendation and future-year limits. Grade Exercise 8 (1452133) retains existing instructions and links to the five-point rubric in updated solution file 14069778, with October 27 5 p.m. Mountain release text. Canvas DesignPLUS wrappers and canonical file URLs accounted for; unrelated settings preserved.
+
+
+7. Canvas — starter file 13545289/module item 3180674.
+Issue/evidence: current attachment is soup-based 11-starter-code.qmd; common CSV/PDF already available.
+Change proposed: replace intended legacy starter attachment with verified local 09-starter-code.qmd, update its module label and confirm saved bytes/module target; avoid a duplicate version. The currently saved Canvas 11-starter-code.qmd filename is not corrected by the local rename.
+Effect: Depends on finalized starter. No upload authorized yet.
+Decision: Approve — Cam authorized commit/push, Canvas publication and scheduling on 2026-10-14.
+Status: Verified.
+Completion evidence — 2026-10-14: Verified uploaded 09-starter-code.qmd file 14069777, published module item 3302324 under Overfitting and Prediction. Downloaded bytes match local SHA256 F46B7215265D7B4A25827545F09F8EB1804C5ACF89DB456872DB97A6E0E945A8. Removed superseded legacy module item 3180674 after verifying replacement.
+
+
+8. GitHub — main/origin/main and generated slides.
+Issue/evidence: initial HEAD equals tracked upstream; slide HTML/index still show old soup examples. No automatic build. Source edits cannot update hosted slides by themselves.
+Change proposed: only after explicit render and GitHub authorization, render and review slides, commit intended lecture files and push main; verify local/remote commit and deployment.
+Effect: Required before item 9 can publish new slides. No render, commit or push authorized.
+Decision: Approve — Cam authorized commit/push, Canvas publication and scheduling on 2026-10-14.
+Status: Verified.
+Completion evidence — 2026-10-14: All lecture-repository changes committed and pushed on main in content commit 76b0424e7a94ec8cba1f607d8ff4170f91a5a89e; remote main matched. User-refreshed index.html and 09-Overfitting-and-Prediction.html are byte-identical and match current source content. Inspected existing HTML in a headless browser: 47 slides; exercise slides readable; no actual clipped content. GitHub Pages build/deployment 38647066067 succeeded for the content commit. Live HTML matches local text exactly after Git line-ending normalization. No re-render was needed. This completion record is included in a final publication-audit commit.
+
+
+9. Canvas — 09 - Slides (3180672), https://cdbale.github.io/09-Overfitting-and-Prediction/.
+Issue/evidence: link already points to Pages, but current source migration is unpublished. Fresh HTTPS fetch returned 200 on 2026-10-09; hosted HTML contains soup_data, nonsense_01 and Exercise 10, with no home_goods_customers.csv import.
+Change proposed: after verified publication, fetch actual hosted slide content, update version query if needed and verify saved Canvas destination with fresh fetch.
+Effect: Depends on item 8 and explicit Canvas publication authorization.
+Decision: Approve — Cam authorized commit/push, Canvas publication and scheduling on 2026-10-14.
+Status: Verified.
+Completion evidence — 2026-10-14: Verified published Canvas slide item 3180672 points to the live GitHub Pages URL with a commit-based version query. Fetched that saved URL and confirmed it serves current lecture HTML, including the final Exercise 8 instructions. Uploaded HTML file 14069774 matches local SHA256 3E72CEF26A9252970B114B4BD223EA1E7F26B1F30602BB92536C5B4F4D90FA67; published module item 3302323 under Overfitting and Prediction; removed obsolete item 3180673 after verifying replacement. Link version will track the final pushed audit commit, whose slide content is unchanged.
+
+
+19. Exercise 8 syllabus deadlines, current solution and release scheduling — 2026-10-14.
+Decision: Approve — directly requested as part of Canvas publication.
+Status: Verified.
+Verification: Fresh Canvas course 38688, term 386 (2026 Fall), America/Denver; sections 40948 (001) and 40947 (002). Syllabus Week 9 lists Exercise 8 on Tuesday, October 27, at class start. Existing base deadline 2026-10-27T20:00:00Z = 2 p.m. MDT, and section-002 override 2026-10-27T21:30:00Z = 3:30 p.m. MDT already agree, so preserved both. Graded exercise remains one week later, November 3, at the corresponding section meeting times. Preserved other assignment dates and settings.
+Replaced old Exercise 8 Solution.qmd (previously scheduled October 20) with updated solution file 14069778; downloaded SHA256 F3CD0945320A79F97593415051A25040AA37045C93221D2B90A232B84797F19D matches local. Set unlock_at 2026-10-27T23:00:00Z = October 27 at 5 p.m. MDT, locked=false, hidden=false, no lock_at. Added published module item 3302325 immediately after Exercise 8 and Grade Exercise 8 under Preprocess Data, the due lecture. Slides, HTML and starter are published under Overfitting and Prediction. Shared customer CSV and dictionary remain published and available. Read-back verification saved outside the lecture repo in tmp/lecture09-publish/final-verification.json. All requested Canvas work verified.
