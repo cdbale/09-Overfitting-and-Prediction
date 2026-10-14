@@ -1,0 +1,150 @@
+---
+title: "Exercise 8 Solution"
+author: "Cameron Bale"
+format: docx
+---
+
+## Exercise 8 | A Useful Customer-Spending Model
+
+The retailer wants dependable estimates of past annual spending for customers whose purchase records have not yet been linked to their household surveys.
+
+Use `home_goods_customers.csv` and `data_dictionary.pdf`. The outcome is `PreviousSpend`. Choose **two plausible models** and use them to predict spending.
+
+Reserve 25% of customers as the holdout set (using random seed 42); the remaining 75% will be the training set. Remember to report sample sizes.
+
+## Exercise 8 | Evidence and Recommendation {.smaller}
+
+Submit a Word report rendered from Quarto containing your code, results and interpretation. Include:
+
+- Your two models and a brief written description for the reasoning behind the variables you included. Estimate them using only the training customers.
+- A comparison of $R^2$ and holdout MAE in dollars. Explain whether these measures favor the same model and why they might differ.
+- Your preferred model and the dollar improvement in predictive performance, if any, compared to the other model. Discuss whether that improvement is useful for this client.
+- Discuss why this assessment does not guarantee that your chosen model would provide accurate predictions of spending in a later year.
+
+Upload the report to Canvas's **Exercise 8** assignment.
+
+## Grading Rubric | Five Points Total
+
+Award up to **one point for each criterion** below, with partial credit for correct parts. Different defensible predictors, categorical baselines, sample sizes and preferred models are acceptable. Students do not need to reproduce this example or make the more complex model perform worse.
+
+1. **Plausible models and reasoning:** two customer-spending models with a brief explanation of why the included variables suit the retailer's prediction question.
+2. **Correct split and fitting:** a reproducible 75/25 training/holdout split with seed 42; reported sample sizes; both models estimated using only training customers.
+3. **Correct performance evidence:** training R-squared and holdout MAE in dollars for both models, with predictions paired to the correct observed outcomes; explains whether the measures favor the same model and why they might differ.
+4. **Client recommendation:** identifies a preferred model, reports its dollar improvement in holdout MAE over the other model, if any, and explains whether that improvement is useful for the client.
+5. **Future-year limitation and communication:** a Word report rendered from Quarto with code, results and interpretation; explains why this assessment does not guarantee accurate spending predictions in a later year.
+
+## Example Solution | Two Plausible Spending Stories
+
+- **Basic model:** income represents household resources; homeownership distinguishes housing circumstances. Both were used in Lecture 07.
+- **Expanded household model:** also considers household size, children at home, home size and age. These may describe differences in needs and living circumstances beyond resources and ownership.
+
+The expanded model requires four additional survey characteristics. Neither model uses website activity, campaign assignment or campaign outcomes. The outcome is spending during the observed previous 12 months, not future customer lifetime value.
+
+## Read and Prepare the Customer Records
+
+```{r message=FALSE}
+library(tidyverse)
+library(tidymodels)
+
+customers <- read_csv("home_goods_customers.csv", show_col_types = FALSE)
+```
+
+```{r}
+exercise_data <- customers |>
+  drop_na(PreviousSpend, HouseholdIncome, Homeowner, HouseholdSize,
+          ChildrenAtHome, HomeSizeSqFt, Age) |>
+  mutate(IncomeThousands = HouseholdIncome / 1000,
+         HomeSizeHundreds = HomeSizeSqFt / 100)
+
+nrow(exercise_data)
+```
+
+The common comparison sample has **9,603 customers**. The two models use these same customers even though the basic model needs fewer variables. Missing survey responses are not zeros.
+
+`PreviousSpend` is annual retailer spending in dollars. Income is in thousands of annual household dollars; home size is in hundreds of square feet; household size and children are counts; age is in years. `Homeowner = 0` (does not own the primary residence) is the reference group for the binary ownership indicator. This example uses no other categorical predictor.
+
+## Reserve Customers Before Fitting
+
+```{r}
+set.seed(42)
+exercise_split <- initial_split(exercise_data, prop = 0.75)
+exercise_train <- training(exercise_split)
+exercise_test <- testing(exercise_split)
+
+tibble(
+  sample = c("Eligible", "Training", "Testing"),
+  customers = c(nrow(exercise_data), nrow(exercise_train), nrow(exercise_test))
+)
+```
+
+There are **7,202 training customers** and **2,401 holdout customers**. These are the 75/25 shares of the 9,603 eligible records, rounded to whole customers. A random customer split compares customers in this same period; it does not reserve a later year.
+
+## Estimate Both Models on Training Customers
+
+```{r}
+fit_basic <- linear_reg() |>
+  set_engine("lm") |>
+  fit(PreviousSpend ~ IncomeThousands + Homeowner,
+      data = exercise_train)
+
+fit_household <- linear_reg() |>
+  set_engine("lm") |>
+  fit(PreviousSpend ~ IncomeThousands + Homeowner + HouseholdSize +
+        ChildrenAtHome + HomeSizeHundreds + Age,
+      data = exercise_train)
+```
+
+Both specifications were chosen for their spending stories before checking the testing results. The held-out outcomes do not help estimate coefficients.
+
+## Compare Training Fit
+
+```{r}
+training_fit <- bind_rows(
+  basic = glance(fit_basic),
+  household = glance(fit_household),
+  .id = "model"
+) |>
+  select(model, r.squared)
+
+as.data.frame(training_fit)
+```
+
+The basic model's training R-squared is about **0.4190**, versus **0.5248** for the expanded model. The expanded model explains more of the spending variation among the training customers.
+
+R-squared measures training fit. It has not yet checked predictions against outcomes for different customers.
+
+## Compare Predictions with Held-Out Spending
+
+```{r}
+predictions_basic <- fit_basic |>
+  predict(new_data = exercise_test) |>
+  bind_cols(exercise_test)
+
+predictions_household <- fit_household |>
+  predict(new_data = exercise_test) |>
+  bind_cols(exercise_test)
+
+testing_fit <- bind_rows(
+  basic = mae(predictions_basic, truth = PreviousSpend, estimate = .pred),
+  household = mae(predictions_household, truth = PreviousSpend, estimate = .pred),
+  .id = "model"
+) |>
+  select(model, .estimate)
+
+as.data.frame(testing_fit)
+```
+
+| Model | Training R-squared | Holdout MAE |
+|---|---:|---:|
+| Basic | 0.4190 | $135.97 |
+| Expanded household | 0.5248 | $120.81 |
+
+The expanded model lowers holdout MAE by about **$15.15**, calculated before rounding the displayed errors. Both measures favor it on this split. They can disagree because R-squared evaluates fit to training customers, while holdout MAE evaluates absolute prediction errors for customers the model has not seen. A model can fit training-specific patterns that do not help with new customers.
+
+## Recommendation and Limitations
+
+I prefer the expanded household model for estimating spending among similar customers. Its predictions miss actual spending by about **$120.81 on average**, compared with **$135.97** for the basic model.
+
+The roughly **$15.15 reduction in average absolute error** is useful if the extra household information is readily available and that improvement matters for the client's decisions. If obtaining the information is costly, the gain may not justify that cost. Substantial prediction error remains, so these estimates should not be treated as exact customer spending amounts.
+
+**Why this does not guarantee next year's accuracy:** the random holdout contains different customers from the same period, not spending observed in a later year. Prices, economic conditions, customer mix and purchasing behavior could change. We would need actual later-year outcomes to check how well the model predicts spending then.
